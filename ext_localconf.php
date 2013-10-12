@@ -8,6 +8,9 @@ $GLOBALS['TYPO3_CONF_VARS']['SYS']['textfile_ext'] = implode(',', array_unique($
 /** @var \TYPO3\CMS\Extbase\SignalSlot\Dispatcher $signalSlotDispatcher */
 $signalSlotDispatcher = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\SignalSlot\\Dispatcher');
 
+// Hook into EXT:restdoc
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['restdoc']['replaceLinksHook'][] = 'Causal\\Sphinx\\Hook\\Restdoc';
+
 // Hook into EXT:documentation
 $signalSlotDispatcher->connect(
 	'TYPO3\\CMS\\Documentation\\Controller\\DocumentController',
