@@ -149,6 +149,9 @@ class InteractiveViewerController extends AbstractActionController
         $this->view->assign('buttons', $buttons);
 
         $this->view->assign('editUrl', $this->getEditUrl($reference, $document, true));
+
+        $extensionManagerUri = MiscUtility::getExtensionManagerLink();
+        $this->view->assign('extensionManagerUri', $extensionManagerUri);
     }
 
     /**

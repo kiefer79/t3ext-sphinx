@@ -24,6 +24,21 @@ The Sphinx Python Documentation Generator and Viewer extension can be installed 
 process using the Extension Manager.
 
 
+**Idea for revamped CSH**
+
+.. code-block:: rest
+
+    .. t3interactive::
+        :action: open:extension-manager
+
+        Open Extension Manager for me
+
+would be removed from standalone HTML and PDF but would render as within a TYPO3 instance:
+
+.. raw:: html
+
+    <span data-type="interactive" data-action="open:extension-manager">Open Extension Manager for me</span>
+
 .. _configure-sphinx:
 
 Downloading and configuring Sphinx
