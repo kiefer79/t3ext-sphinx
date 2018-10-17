@@ -14,6 +14,7 @@
 
 namespace Causal\Sphinx\Utility;
 
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
@@ -742,7 +743,6 @@ HTML;
         try {
             $tags = array();
             $useCache = !empty($synchronizeFileExtensions);
-
             if ($format === 'json') {
                 SphinxBuilder::buildJson($documentationBasePath, '.', '_make/build', '_make/conf.py', $locale, $tags, $useCache);
             } elseif ($format === 'pdf') {
@@ -751,10 +751,11 @@ HTML;
                 SphinxBuilder::buildHtml($documentationBasePath, '.', '_make/build', '_make/conf.py', $locale, $tags, $useCache);
             }
         } catch (\RuntimeException $e) {
+
             switch ($e->getCode()) {
                 case 1366210198:    // Sphinx is not configured
                 case 1366280021:    // Sphinx cannot be executed
-                    $emLink = static::getExtensionManagerLink('sphinx', 'Configuration', 'showConfigurationForm');
+                    // $emLink = static::getExtensionManagerLink('sphinx', 'Configuration', 'showConfigurationForm');
                     $templateContent = <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -764,7 +765,7 @@ HTML;
   </head>
   <body>
     <pre>###CONTENT###</pre>
-    <p><a href="$emLink" target="_parent">Click here</a> to configure the sphinx extension.</p>
+    <p>Configure the sphinx extension.</p>
   </body>
 </html>
 HTML;
@@ -969,7 +970,7 @@ HTML;
      */
     public static function getExportCommand($variable, $value)
     {
-        if (TYPO3_OS === 'WIN') {
+        if (Environment::isWindows()) {
             $pattern = 'SET %s=%s';
             $value = preg_replace('/\$' . $variable . '([^A-Za-z]|$)/', '%' . $variable . '%', $value);
         } else {

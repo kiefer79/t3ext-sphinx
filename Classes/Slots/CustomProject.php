@@ -36,7 +36,7 @@ class CustomProject
 
     /**
      * @var \Causal\Sphinx\Domain\Repository\ProjectRepository
-     * @inject
+     * @TYPO3\CMS\Extbase\Annotation\Inject
      */
     protected $projectRepository;
 
@@ -257,7 +257,6 @@ class CustomProject
             switch ($e->getCode()) {
                 case 1366210198:    // Sphinx is not configured
                 case 1366280021:    // Sphinx cannot be executed
-                    $emLink = MiscUtility::getExtensionManagerLink('sphinx', 'Configuration', 'showConfigurationForm');
                     $templateContent = <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -267,7 +266,7 @@ class CustomProject
   </head>
   <body>
     <pre>###CONTENT###</pre>
-    <p><a href="$emLink" target="_parent">Click here</a> to configure the sphinx extension.</p>
+    <p>Go to extension configuration of the sphinx extension.</p>
   </body>
 </html>
 HTML;

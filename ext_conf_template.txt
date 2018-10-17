@@ -1,5 +1,5 @@
-# cat=basic//10; type=user[EXT:sphinx/Classes/EM/Configuration.php:Causal\Sphinx\EM\Configuration->getVersions]; label=LLL:EXT:sphinx/Resources/Private/Language/locallang_db.xlf:settings.sphinx.version
-version =
+# cat=basic//10; type=string; label=LLL:EXT:sphinx/Resources/Private/Language/locallang_db.xlf:settings.sphinx.version
+version = 1.7
 
 # cat=basic//20; type=boolean; label=LLL:EXT:sphinx/Resources/Private/Language/locallang_db.xlf:settings.build.auto_continue
 auto_continue = 1
@@ -10,7 +10,7 @@ pdf_builder =
 # cat=pdf//20; type=boolean; label=LLL:EXT:sphinx/Resources/Private/Language/locallang_db.xlf:settings.build.rst2pdf
 install_rst2pdf = 0
 
-# cat=plugins; type=user[EXT:sphinx/Classes/EM/Configuration.php:Causal\Sphinx\EM\Configuration->getPlugins]; label=LLL:EXT:sphinx/Resources/Private/Language/locallang_db.xlf:settings.sphinx.plugins
+# cat=plugins; type=string; label=LLL:EXT:sphinx/Resources/Private/Language/locallang_db.xlf:settings.sphinx.plugins
 plugins =
 
 # cat=advanced//10; type=string; label=LLL:EXT:sphinx/Resources/Private/Language/locallang_db.xlf:settings.build.rsync_files

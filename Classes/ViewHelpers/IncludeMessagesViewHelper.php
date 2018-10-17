@@ -14,6 +14,12 @@
 
 namespace Causal\Sphinx\ViewHelpers;
 
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
+use TYPO3Fluid\Fluid\Core\ViewHelper\Traits\CompileWithRenderStatic;
+
 /**
  * Includes localized messages.
  *
@@ -23,14 +29,22 @@ namespace Causal\Sphinx\ViewHelpers;
  * @copyright   Causal Sàrl
  * @license     http://www.gnu.org/copyleft/gpl.html
  */
-class IncludeMessagesViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
+class IncludeMessagesViewHelper extends AbstractViewHelper
 {
+
+    use CompileWithRenderStatic;
 
     /**
      * Required for TYPO3 v8
      * @var bool
      */
     protected $escapeOutput = false;
+
+    public function initializeArguments()
+    {
+        $this->registerArgument('keyPrefix', 'string', 'key prefix', false);
+        $this->registerArgument('jsDictionnary', 'string', 'js dictionary', false);
+    }
 
     /**
      * Renders the JS snippet.
@@ -39,9 +53,41 @@ class IncludeMessagesViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\Abstrac
      * @param string $jsDictionnary
      * @return string
      */
-    public function render($keyPrefix, $jsDictionnary)
+//    public function render(string $keyPrefix, string $jsDictionnary)
+//    {
+//
+//        $llFile = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('sphinx') . 'Resources/Private/Language/locallang.xlf';
+//        $labels = $GLOBALS['LANG']->includeLLFile($llFile, false);
+//        $keys = array_filter(array_keys($labels['default']), function ($item) use ($keyPrefix) {
+//            return substr($item, 0, strlen($keyPrefix)) === $keyPrefix;
+//        });
+//
+//        $messages = array();
+//        foreach ($keys as $key) {
+//            $messages[$key] = \TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate($key, 'sphinx');
+//        }
+//
+//        $json = json_encode($messages);
+//        $out = <<<JS
+//$(document).ready(function () {
+//    $jsDictionnary = $json;
+//});
+//JS;
+//
+//        return $out;
+//    }
+
+    /**
+     * Render the URI to the resource. The filename is used from child content.
+     *
+     * @param array $arguments
+     * @param \Closure $renderChildrenClosure
+     * @param RenderingContextInterface $renderingContext
+     * @return string The URI to the resource
+     */
+    public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
-        $llFile = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('sphinx') . 'Resources/Private/Language/locallang.xlf';
+        $llFile = ExtensionManagementUtility::extPath('sphinx') . 'Resources/Private/Language/locallang.xlf';
         $labels = $GLOBALS['LANG']->includeLLFile($llFile, false);
         $keys = array_filter(array_keys($labels['default']), function ($item) use ($keyPrefix) {
             return substr($item, 0, strlen($keyPrefix)) === $keyPrefix;
@@ -49,7 +95,7 @@ class IncludeMessagesViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\Abstrac
 
         $messages = array();
         foreach ($keys as $key) {
-            $messages[$key] = \TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate($key, 'sphinx');
+            $messages[$key] = LocalizationUtility::translate($key, 'sphinx');
         }
 
         $json = json_encode($messages);
@@ -61,5 +107,6 @@ JS;
 
         return $out;
     }
+
 
 }

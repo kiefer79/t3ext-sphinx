@@ -15,8 +15,10 @@
 namespace Causal\Sphinx\ViewHelpers\Uri;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
-use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
+use TYPO3\CMS\Core\Utility\PathUtility;
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
+use TYPO3Fluid\Fluid\Core\ViewHelper\Traits\CompileWithRenderStatic;
 
 /**
  * A view helper for creating URIs to Sphinx resources
@@ -27,27 +29,15 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
  * @copyright   Causal Sàrl
  * @license     http://www.gnu.org/copyleft/gpl.html
  */
-class SphinxResourceViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper implements CompilableInterface
+class SphinxResourceViewHelper extends AbstractViewHelper
 {
 
-    /**
-     * Render the URI to the resource. The filename is used from child content.
-     *
-     * @param string $path The path and filename of the resource (relative to Public resource directory of the extension).
-     * @param bool $absolute If set, an absolute URI is rendered
-     * @return string The URI to the resource
-     * @api
-     */
-    public function render($path, $absolute = false)
+    use CompileWithRenderStatic;
+
+    public function initializeArguments()
     {
-        return static::renderStatic(
-            array(
-                'path' => $path,
-                'absolute' => $absolute
-            ),
-            $this->buildRenderChildrenClosure(),
-            $this->renderingContext
-        );
+        $this->registerArgument('path', 'string', 'the sphinx resource path', false);
+        $this->registerArgument('absolute', 'bool', 'absolute path?', false);
     }
 
     /**
@@ -58,19 +48,20 @@ class SphinxResourceViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\Abstract
      */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
+
         $path = $arguments['path'];
         $absolute = $arguments['absolute'];
 
         $uri = 'uploads/tx_sphinx/' . $path;
         $uri = GeneralUtility::getFileAbsFileName($uri);
-        $uri = \TYPO3\CMS\Core\Utility\PathUtility::stripPathSitePrefix($uri);
+        $uri = PathUtility::stripPathSitePrefix($uri);
         if (TYPO3_MODE === 'BE' && $absolute === false && $uri !== false) {
             $uri = '../' . $uri;
         }
         if ($absolute === true) {
             $uri = $renderingContext->getControllerContext()->getRequest()->getBaseUri() . $uri;
         }
+
         return $uri;
     }
-
 }

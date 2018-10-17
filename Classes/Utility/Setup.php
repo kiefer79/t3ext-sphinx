@@ -14,6 +14,7 @@
 
 namespace Causal\Sphinx\Utility;
 
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Utility\CommandUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
@@ -135,6 +136,16 @@ class Setup
         $tempPath = MiscUtility::getTemporaryPath();
         $sphinxSourcesPath = static::getSphinxSourcesPath();
 
+        // There is a redirect from the URI in the web interface. E.g.,
+        // https://github.com/sphinx-doc/sphinx/archive/1.3.zip
+        // and the actual download link:
+        // https://codeload.github.com/sphinx-doc/sphinx/zip/1.3
+        if (preg_match('#https://github.com/sphinx-doc/sphinx/releases/tag/#', $url, $matches)) {
+            $url = 'https://codeload.github.com/sphinx-doc/sphinx/zip/' . $version;
+        }
+
+
+
         $zipFilename = $tempPath . $version . '.zip';
         static::$log[] = '[INFO] Fetching ' . $url;
         $zipContent = MiscUtility::getUrl($url);
@@ -144,7 +155,7 @@ class Setup
 
             // Unzip the Sphinx archive
             $out = array();
-            if (static::unarchive($zipFilename, $targetPath, 'sphinx-doc-sphinx-')) {
+            if (static::unarchive($zipFilename, $targetPath, 'sphinx-' . $version)) {
                 $output[] = '[INFO] Sphinx ' . $version . ' has been unpacked.';
 
                 // Patch Sphinx to let us get colored output
@@ -260,7 +271,7 @@ class Setup
                 $shortcutFilename = $sphinxPath . 'bin' . DIRECTORY_SEPARATOR . $shortcutScript . '-' . $version;
                 $scriptFilename = $sphinxPath . $version . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . $shortcutScript;
 
-                if (TYPO3_OS === 'WIN') {
+                if (Environment::isWindows()) {
                     $shortcutFilename .= '.bat';
                     $scriptFilename .= '.exe';
 
@@ -325,7 +336,7 @@ EOT;
         foreach ($shortcutScripts as $shortcutScript) {
             $shortcutFilename = $sphinxPath . 'bin' . DIRECTORY_SEPARATOR . $shortcutScript;
 
-            if (TYPO3_OS === 'WIN') {
+            if (Environment::isWindows()) {
                 $shortcutFilename .= '.bat';
             }
 
@@ -603,7 +614,7 @@ EOT;
                 $directories = GeneralUtility::get_dirs($buildPath);
                 foreach ($directories as $directory) {
                     if (GeneralUtility::isFirstPartOfStr($directory, 'lib.')) {
-                        if (TYPO3_OS === 'WIN') {
+                        if (Environment::isWindows()) {
                             GeneralUtility::mkdir($buildPath . 'lib');
                             MiscUtility::recursiveCopy($buildPath . $directory, $buildPath . 'lib');
                         } else {
@@ -1250,29 +1261,16 @@ EOT;
      */
     public static function getSphinxAvailableVersions()
     {
-        $versions = [];
-        // for some reason the releases API does not yield any results, so we use the tags API
-        $rawJson = MiscUtility::getUrlWithCache('https://api.github.com/repos/sphinx-doc/sphinx/tags');
-        $json = \json_decode($rawJson);
-
-        foreach($json as $tag) {
-            $key = $tag->{'name'};
-            $name = $key;
-            $url = $tag->{'zipball_url'};
-
-            // Make sure main release (e.g., "1.2") gets a ".0" patch release version as well
-            if (preg_match('/^\d+\.\d+$/', $name)) {
-                $name .= '.0';
-            }
-            // Fix sorting of alpha/beta releases
-            $name = str_replace(['a', 'b'], [' alpha ', ' beta '], $name);
-
-            $versions[$name] = [
-                'key' => $key,
-                'name' => $name,
-                'url' => $url,
-            ];
-        }
+        $versions['1.7'] = array(
+            'key' => '1.7',
+            'name' => '1.7',
+            'url' => '/sphinx-doc/sphinx/releases/tag/1.7',
+        );
+        $versions['1.6'] = array(
+            'key' => '1.6',
+            'name' => '1.6',
+            'url' => '/sphinx-doc/sphinx/releases/tag/1.6',
+        );
 
         krsort($versions);
         return $versions;
@@ -1566,6 +1564,9 @@ EOT;
         $cmd = 'cd ' . escapeshellarg(PathUtility::dirname($setupFile)) . ' && ' .
             $python . ' setup.py clean 2>&1 && ' .
             $python . ' setup.py' . ($extraFlags ? ' ' . $extraFlags : '') . ' build 2>&1';
+
+
+
         $out = array();
         static::exec($cmd, $out, $ret);
         if ($ret === 0) {

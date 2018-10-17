@@ -16,6 +16,7 @@ namespace Causal\Sphinx;
 
 $BACK_PATH = $GLOBALS['BACK_PATH'] . TYPO3_mainDir;
 
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Causal\Sphinx\Utility\Setup;
 
@@ -198,7 +199,9 @@ HTML;
         $out[] = '<th>Manual Process</th>';
         $out[] = '</tr>';
 
-        $installRst2Pdf = TYPO3_OS !== 'WIN' && $this->configuration['install_rst2pdf'] === '1';
+
+
+        $installRst2Pdf = !Environment::isWindows() && $this->configuration['install_rst2pdf'] === '1';
         $changes = array();
 
         /** @var \TYPO3\CMS\Core\Imaging\IconFactory $iconFactory */
@@ -300,9 +303,9 @@ HTML;
     protected function downloadSphinx(array $data, array &$output)
     {
         $success = true;
-        $installRst2Pdf = TYPO3_OS !== 'WIN' && $this->configuration['install_rst2pdf'] === '1';
+        $installRst2Pdf = !Environment::isWindows() && $this->configuration['install_rst2pdf'] === '1';
         $version = $data['key'];
-        $url = $data['url'];
+        $url = 'https://github.com' . $data['url'];
 
         if (!Setup::hasSphinxSources($version)) {
             $success &= Setup::downloadSphinxSources($version, $url, $output);
@@ -352,7 +355,7 @@ HTML;
     {
         $success = false;
         $version = $data['key'];
-        $installRst2Pdf = TYPO3_OS !== 'WIN' && $this->configuration['install_rst2pdf'] === '1';
+        $installRst2Pdf = !Environment::isWindows() && $this->configuration['install_rst2pdf'] === '1';
 
         if (Setup::hasSphinxSources($version)) {
             $success = Setup::buildSphinx($version, $output);

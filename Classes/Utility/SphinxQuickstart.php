@@ -14,6 +14,7 @@
 
 namespace Causal\Sphinx\Utility;
 
+use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -155,6 +156,7 @@ class SphinxQuickstart
      */
     protected static function createFromTemplate(array $config)
     {
+
         /** @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $contentObj */
         $contentObj = GeneralUtility::makeInstance(\TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer::class);
 
@@ -180,7 +182,11 @@ class SphinxQuickstart
                         $targetSubPathName = substr($targetSubPathName, 0, -18) . $config['masterDocument'] . $config['sourceFileSuffix'];
                     }
                     $contents = file_get_contents($item);
-                    $contents = $contentObj->substituteMarkerArray($contents, $config['markers'], '###|###');
+                    // $contents = $contentObj->substituteMarkerArray($contents, $config['markers'], '###|###');
+                    $templateService = GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
+                    $contents = $templateService->substituteMarkerArray($contents, $config['markers'], '###|###');
+
+
                     GeneralUtility::writeFile($config['path'] . DIRECTORY_SEPARATOR . $targetSubPathName, $contents);
                 } elseif (substr($item, -4) === '.rst') {
                     $targetSubPathName = substr($iterator->getSubPathName(), 0, -4) . $config['sourceFileSuffix'];
