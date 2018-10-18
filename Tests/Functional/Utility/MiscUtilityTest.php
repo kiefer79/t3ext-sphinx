@@ -15,6 +15,8 @@
 namespace Causal\Sphinx\Tests\Functional\Utility;
 
 use Causal\Sphinx\Utility\MiscUtility;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Testcase for class \Causal\Sphinx\Utility\MiscUtility.
@@ -76,7 +78,7 @@ class MiscUtilityTest extends \TYPO3\CMS\Core\Tests\UnitTestCase
         if (!\Causal\Sphinx\Utility\SphinxBuilder::isReady()) {
             $this->markTestIncomplete('This test requires a working Sphinx environment.');
         }
-        $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['sphinx']);
+        $configuration = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('sphinx');
         if ($configuration['pdf_builder'] !== 'pdflatex') {
             $this->markTestIncomplete('This test requires LaTeX to build PDF.');
         }
@@ -122,7 +124,7 @@ class MiscUtilityTest extends \TYPO3\CMS\Core\Tests\UnitTestCase
         if (!\Causal\Sphinx\Utility\SphinxBuilder::isReady()) {
             $this->markTestIncomplete('This test requires a working Sphinx environment.');
         }
-        $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['sphinx']);
+        $configuration = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('sphinx');
         if ($configuration['pdf_builder'] !== 'pdflatex') {
             $this->markTestIncomplete('This test requires LaTeX to build PDF.');
         }

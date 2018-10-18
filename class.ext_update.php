@@ -16,6 +16,7 @@ namespace Causal\Sphinx;
 
 $BACK_PATH = $GLOBALS['BACK_PATH'] . TYPO3_mainDir;
 
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Causal\Sphinx\Utility\Setup;
@@ -45,7 +46,7 @@ class ext_update extends \TYPO3\CMS\Backend\Module\BaseScriptClass
      */
     public function __construct()
     {
-        $this->configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->extKey]);
+        $this->configuration = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('sphinx');
     }
 
     /**
@@ -225,6 +226,7 @@ HTML;
 
             $out[] = '<tr data-version="' . htmlspecialchars($version['key']) . '">';
             $iconChecked = $iconFactory->getIcon('status-status-checked', \TYPO3\CMS\Core\Imaging\Icon::SIZE_SMALL)->render();
+
             $out[] = '<td>' . ($isInstalled ? $iconChecked : '') . '</td>';
             $out[] = '<td>';
             $out[] = 'Sphinx ' . htmlspecialchars($version['name']);

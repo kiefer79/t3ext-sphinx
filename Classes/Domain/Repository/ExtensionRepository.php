@@ -165,22 +165,8 @@ class ExtensionRepository implements \TYPO3\CMS\Core\SingletonInterface
     public function findExtensionsBySearchTerm(array $extensionKeys, $searchTerm, $limit)
     {
         $extensionTable = 'tx_extensionmanager_domain_model_extension';
-        $extensions = $this->getDatabaseConnection()->exec_SELECTgetRows(
-            'DISTINCT extension_key, title',
-            $extensionTable,
-            $this->getSafeInClause('extension_key', array_map(function ($e) {
-                return "'" . $e . "'";
-            }, $extensionKeys)) .
-            ' AND ' . $this->getDatabaseConnection()->searchQuery(
-                array($searchTerm),
-                array('extension_key', 'title', 'description'),
-                $extensionTable
-            ),
-            '',
-            'extension_key, last_updated',
-            $limit,
-            'extension_key'
-        );
+
+
 
         // TYPO3 6.2 is shipping Sphinx-based manuals for system extensions but they are not published to
         // TER and as such cannot be cross-linked to easily
@@ -329,16 +315,6 @@ class ExtensionRepository implements \TYPO3\CMS\Core\SingletonInterface
         $extension->setDescription($metadata['description']);
 
         return $extension;
-    }
-
-    /**
-     * Returns the database connection.
-     *
-     * @return \TYPO3\CMS\Core\Database\DatabaseConnection
-     */
-    protected function getDatabaseConnection()
-    {
-        return $GLOBALS['TYPO3_DB'];
     }
 
     /**

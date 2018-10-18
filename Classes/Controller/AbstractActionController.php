@@ -44,7 +44,7 @@ abstract class AbstractActionController extends \TYPO3\CMS\Extbase\Mvc\Controlle
      */
     protected function injectSettings()
     {
-        $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->request->getControllerExtensionKey()]);
+        $configuration = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get($this->request->getControllerExtensionKey());
         if (!is_array($configuration)) {
             $configuration = array();
         }

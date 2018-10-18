@@ -14,6 +14,7 @@
 
 namespace Causal\Sphinx\Utility;
 
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
@@ -463,36 +464,6 @@ HTML;
      */
     public static function intersphinxKeyToExtensionKey($intersphinxKey)
     {
-        /** @var \TYPO3\CMS\Core\Database\DatabaseConnection $databaseConnection */
-        $databaseConnection = $GLOBALS['TYPO3_DB'];
-
-        // We filter the query by using the first two letters of the intersphinx key
-        // or first letter and an underscore
-        //
-        // In the worst case, this query:
-        //
-        // SELECT SUBSTR(extension_key, 1, 2), COUNT(*) FROM (
-        //     SELECT DISTINCT extension_key FROM tx_extensionmanager_domain_model_extension
-        // ) as tmp
-        // GROUP BY SUBSTR(extension_key, 1, 2)
-        //
-        // shows that about 120 rows containing a single (short) string will be returned.
-        // The additional condition "WHERE extension_key LIKE '%\_%'" has not been added
-        // because it did not seem to be really significant to trim down the list even more.
-        $table = 'tx_extensionmanager_domain_model_extension';
-        $rows = $databaseConnection->exec_SELECTgetRows(
-            'DISTINCT extension_key',
-            $table,
-            'extension_key LIKE ' . $databaseConnection->fullQuoteStr(
-                $databaseConnection->escapeStrForLike(substr($intersphinxKey, 0, 2), $table) . '%',
-                $table
-            ) . ' OR extension_key LIKE ' . $databaseConnection->fullQuoteStr(
-                $databaseConnection->escapeStrForLike($intersphinxKey{0} . '_', $table) . '%',
-                $table
-            ),
-            '',
-            'last_updated'
-        );
 
         $mapping = array();
         foreach ($rows as $row) {
@@ -648,8 +619,8 @@ HTML;
             $basePath .= '.' . $locale;
             $documentationBasePath = $basePath . '/Localization.' . $locale;
         }
-
-        $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][static::$extKey]);
+        
+        $configuration = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get(static::$extKey);
         $synchronizeFileExtensions = !empty($configuration['rsync_files'])
             ? GeneralUtility::trimExplode(',', $configuration['rsync_files'], true)
             : array();
@@ -846,7 +817,8 @@ HTML;
             static::recursiveCopy($documentationBasePath . '/_make/build/' . $documentationFormat, $absoluteOutputDirectory);
         } else {
             // Only copy PDF output
-            $configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][static::$extKey]);
+            $configuration = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get(static::$extKey);
+
             switch ($configuration['pdf_builder']) {
                 case 'pdflatex':
                     copy($documentationBasePath . '/_make/build/latex/' . $extensionKey . '.pdf', $absoluteOutputDirectory . '/' . $extensionKey . '.pdf');
@@ -1455,7 +1427,7 @@ YAML;
             $urlParameters[$namespace . '[action]'] = $action;
         }
 
-        $extensionManagerUri = \TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl($moduleName, $urlParameters, false, true);
+        $extensionManagerUri = "#";
         return $extensionManagerUri;
     }
 

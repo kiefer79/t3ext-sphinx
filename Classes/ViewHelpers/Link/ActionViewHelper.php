@@ -14,6 +14,7 @@
 
 namespace Causal\Sphinx\ViewHelpers\Link;
 
+use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
 use Causal\Sphinx\Utility\MiscUtility;
@@ -42,6 +43,7 @@ class ActionViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Link\ActionViewHelpe
         parent::initializeArguments();
 
         $this->registerArgument('icon', 'string', 'Specifies the icon of a link');
+        $this->registerArgument('checks', 'array', '?');
     }
 
     /**
@@ -74,10 +76,13 @@ class ActionViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Link\ActionViewHelpe
                            $addQueryStringMethod = null, array $checks = array())
     {
 
+
         $icon = $this->arguments['icon'];
         $this->tag->addAttribute('href', '#');
         if (!GeneralUtility::isFirstPartOfStr($action, 'javascript')) {
-            $uriBuilder = $this->controllerContext->getUriBuilder();
+            /*
+            $uriBuilder = parent::controllerContext->getUriBuilder();
+
             $uri = $uriBuilder
                 ->reset()
                 ->setTargetPageUid($pageUid)
@@ -94,9 +99,11 @@ class ActionViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Link\ActionViewHelpe
                 ->uriFor($action, $arguments, $controller, $extensionName, $pluginName);
 
             $this->tag->addAttribute('onclick', 'top.TYPO3.Backend.ContentContainer.setUrl(\'' . $uri . '\')');
+            */
         } else {
             $this->tag->addAttribute('onclick', $action);
         }
+
 
         $content = $this->renderChildren();
         if ($icon) {

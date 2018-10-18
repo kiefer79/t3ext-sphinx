@@ -14,6 +14,8 @@
 
 namespace Causal\Sphinx\ViewHelpers;
 
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
+
 /**
  * Creates an objects.inv browser.
  *
@@ -23,7 +25,7 @@ namespace Causal\Sphinx\ViewHelpers;
  * @copyright   Causal Sàrl
  * @license     http://www.gnu.org/copyleft/gpl.html
  */
-class ObjectsInvBrowserViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
+class ObjectsInvBrowserViewHelper extends AbstractViewHelper
 {
 
     /**
@@ -43,6 +45,7 @@ class ObjectsInvBrowserViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\Abstr
      */
     public function render($id, $reference, $cmEditor, \Causal\Sphinx\Controller\RestEditorController $controller)
     {
+
         $out = array();
         $out[] = '<div id="' . $id . '" class="basic">';    // Start of accordion
         $out[] = $controller->accordionReferencesAction($reference, '', false, false);

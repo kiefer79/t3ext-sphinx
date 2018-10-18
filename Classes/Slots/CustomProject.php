@@ -14,6 +14,8 @@
 
 namespace Causal\Sphinx\Slots;
 
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use Causal\Sphinx\Utility\MiscUtility;
@@ -50,7 +52,7 @@ class CustomProject
      */
     public function __construct()
     {
-        $this->settings = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][static::$extKey]);
+        $this->settings = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get(static::$extKey);
     }
 
     /**
@@ -132,7 +134,11 @@ class CustomProject
                     $confPyTemplate = ExtensionManagementUtility::extPath(static::$extKey) . 'Resources/Private/Templates/Projects/TYPO3DocEmptyProject/_make/conf.py.tmpl';
 
                     $contents = file_get_contents($confPyTemplate);
-                    $contents = $contentObj->substituteMarkerArray($contents, $markers, '###|###');
+
+                    $templateService = GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
+                    $contents = $templateService->substituteMarkerArray($contents, $markers, '###|###');
+
+                    
                     GeneralUtility::writeFile($absoluteBasePath . '_make/conf.py', $contents);
                 }
                 break;
